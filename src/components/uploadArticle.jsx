@@ -9,10 +9,18 @@ const UploadArticle = () => {
   const [content, setContent] = useState('');
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState('info');
   const [articles, setArticles] = useState([]);
   const [loadingArticles, setLoadingArticles] = useState(false);
   const [fetchError, setFetchError] = useState('');
   const [editingId, setEditingId] = useState(null);
+  const [uploading, setUploading] = useState(false);
+
+  const showMessage = (msg, type = 'info') => {
+    setMessage(msg);
+    setMessageType(type);
+    setTimeout(() => setMessage(''), 5000);
+  };
 
   const fetchArticles = () => {
     setLoadingArticles(true);
@@ -21,6 +29,10 @@ const UploadArticle = () => {
       .then(res => res.json())
       .then(data => {
         setArticles(data);
+        setLoadingArticles(false);
+      })
+      .catch(err => {
+        setFetchError('Failed to load articles');
         setLoadingArticles(false);
       });
   };
@@ -31,13 +43,12 @@ const UploadArticle = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage('');
+    setUploading(true);
 
     let url = API_BASE;
     let method = 'POST';
-    let body;
+    let body = new FormData();
 
-    body = new FormData();
     body.append('title', title);
     body.append('summary', summary);
     body.append('content', content);
@@ -51,32 +62,33 @@ const UploadArticle = () => {
     }
 
     try {
-      const res = await fetch(url, {
-        method,
-        body,
-      });
+      const res = await fetch(url, { method, body });
       if (!res.ok) throw new Error('Failed to save article');
-      setMessage(editingId ? 'Article updated!' : 'Article uploaded!');
+      
+      showMessage(editingId ? 'Article updated successfully!' : 'Article uploaded successfully!', 'success');
       setTitle('');
       setSummary('');
       setContent('');
       setFile(null);
       setEditingId(null);
       fetchArticles();
-    } catch {
-      setMessage('Failed to upload/update article');
+    } catch (err) {
+      showMessage('Failed to save article. Please try again.', 'error');
+    } finally {
+      setUploading(false);
     }
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this article?')) return;
+    
     try {
       const res = await fetch(`${API_BASE}/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete');
-      setMessage('Article deleted');
+      showMessage('Article deleted successfully', 'success');
       fetchArticles();
-    } catch {
-      setMessage('Failed to delete article');
+    } catch (err) {
+      showMessage('Failed to delete article', 'error');
     }
   };
 
@@ -87,6 +99,7 @@ const UploadArticle = () => {
     setEditingId(article._id);
     setFile(null);
     setMessage('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleCancelEdit = () => {
@@ -98,125 +111,235 @@ const UploadArticle = () => {
     setMessage('');
   };
 
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    setFile(selectedFile);
+  };
+
+  const removeFile = () => {
+    setFile(null);
+  };
+
   return (
-    <div>
+    <div className="cms-layout">
       <Navbar />
-      <div className="upload-article-container">
-        <h2 className="upload-article-title">{editingId ? 'Edit Article' : 'Upload Article'}</h2>
-        <div className="upload-article-status">
-          {editingId ? 'Editing existing article' : 'Upload your article below'}
+      <div className="cms-main-content">
+        <div className="page-header">
+          <h1 className="page-title">
+            {editingId ? 'Edit Article' : 'Upload Article'}
+          </h1>
+          <p className="page-subtitle">
+            {editingId ? 'Update your existing article' : 'Create and publish new articles with rich content'}
+          </p>
         </div>
-        {message && <div className="upload-article-message">{message}</div>}
-        <form onSubmit={handleSubmit} encType="multipart/form-data">
-          <div className="upload-article-form-group">
-            <label className="upload-article-label">Title</label>
-            <input
-              type="text"
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              placeholder="Enter article title"
-              className="upload-article-input"
-              required
-            />
-          </div>
-          <div className="upload-article-form-group">
-            <label className="upload-article-label">Summary</label>
-            <input
-              type="text"
-              value={summary}
-              onChange={e => setSummary(e.target.value)}
-              placeholder="Enter article summary"
-              className="upload-article-input"
-              required
-            />
-          </div>
-          <div className="upload-article-form-group">
-            <label className="upload-article-label">Content</label>
-            <textarea
-              value={content}
-              onChange={e => setContent(e.target.value)}
-              placeholder="Enter article content"
-              rows={6}
-              className="upload-article-textarea"
-              required
-            />
-          </div>
-          <div className="upload-article-form-group">
-            <label className="upload-article-label">Upload file (optional)</label>
-            <input
-              type="file"
-              onChange={e => setFile(e.target.files[0])}
-            />
-            {file && (
-              <div className="upload-article-selected-file">
-                Selected: {file.name}
-                <button
-                  type="button"
-                  className="upload-article-remove-file-btn"
-                  onClick={() => setFile(null)}
-                >
-                  Remove
-                </button>
-              </div>
+
+        {/* Upload Form */}
+        <div className="cms-card">
+          <div className="cms-card-header">
+            <h3 className="cms-card-title">Article Details</h3>
+            {editingId && (
+              <span style={{ 
+                background: '#fef3c7', 
+                color: '#92400e', 
+                padding: '4px 8px', 
+                borderRadius: '12px', 
+                fontSize: '0.8em',
+                fontWeight: '500'
+              }}>
+                Editing Mode
+              </span>
             )}
           </div>
-          <button type="submit" className="upload-btn">
-            {editingId ? 'Update Article' : 'Upload Article'}
-          </button>
-          {editingId && (
-            <button
-              type="button"
-              className="upload-article-btn upload-article-btn-cancel"
-              onClick={handleCancelEdit}
-            >
-              Cancel Edit
-            </button>
-          )}
-        </form>
 
-        <div className="upload-article-existing-container">
-          <h3>Existing Articles</h3>
-          {loadingArticles && <div>Loading articles...</div>}
-          {fetchError && <div className="upload-article-fetch-error">{fetchError}</div>}
-          {!loadingArticles && !fetchError && (
-            <ul style={{ padding: 0, listStyle: 'none' }}>
-              {articles.length === 0 && <li>No articles found.</li>}
+          {message && (
+            <div className={`cms-message cms-message-${messageType}`}>
+              {messageType === 'success' && ''}
+              {messageType === 'error' && ''}
+              {messageType === 'info' && ''}
+              {message}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} encType="multipart/form-data">
+            <div className="cms-form-group">
+              <label className="cms-form-label">Article Title *</label>
+              <input
+                type="text"
+                value={title}
+                onChange={e => setTitle(e.target.value)}
+                placeholder="Enter a compelling article title"
+                className="cms-form-input"
+                required
+              />
+            </div>
+
+            <div className="cms-form-group">
+              <label className="cms-form-label">Summary *</label>
+              <input
+                type="text"
+                value={summary}
+                onChange={e => setSummary(e.target.value)}
+                placeholder="Brief summary that will appear in previews"
+                className="cms-form-input"
+                required
+              />
+            </div>
+
+            <div className="cms-form-group">
+              <label className="cms-form-label">Content *</label>
+              <textarea
+                value={content}
+                onChange={e => setContent(e.target.value)}
+                placeholder="Write your article content here. You can use markdown formatting..."
+                rows={8}
+                className="cms-form-textarea"
+                required
+              />
+              <div style={{ fontSize: '0.85em', color: '#64748b', marginTop: '4px' }}>
+                Tip: You can use markdown formatting for better content structure
+              </div>
+            </div>
+
+            <div className="cms-form-group">
+              <label className="cms-form-label">Featured Image (optional)</label>
+              {!file ? (
+                <div 
+                  className="cms-file-upload"
+                  onClick={() => document.getElementById('article-file-input').click()}
+                >
+                  <div style={{ fontSize: '2em', marginBottom: '8px' }}></div>
+                  <div style={{ fontWeight: '600', marginBottom: '4px' }}>Click to upload image</div>
+                  <div style={{ fontSize: '0.9em', color: '#64748b' }}>
+                    PNG, JPG, GIF up to 10MB
+                  </div>
+                </div>
+              ) : (
+                <div className="cms-file-upload has-file">
+                  <div style={{ fontSize: '1.5em', marginBottom: '8px' }}></div>
+                  <div className="cms-file-info">
+                    <span>{file.name}</span>
+                    <button
+                      type="button"
+                      className="cms-file-remove"
+                      onClick={removeFile}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              )}
+              <input
+                id="article-file-input"
+                type="file"
+                onChange={handleFileChange}
+                accept="image/*"
+                style={{ display: 'none' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+              <button 
+                type="submit" 
+                className="cms-btn cms-btn-primary"
+                disabled={uploading}
+              >
+                {uploading ? 'Saving...' : (editingId ? 'Update Article' : 'Publish Article')}
+              </button>
+              
+              {editingId && (
+                <button
+                  type="button"
+                  className="cms-btn cms-btn-secondary"
+                  onClick={handleCancelEdit}
+                >
+                  Cancel Edit
+                </button>
+              )}
+            </div>
+          </form>
+        </div>
+
+        {/* Articles List */}
+        <div className="cms-card">
+          <div className="cms-card-header">
+            <h3 className="cms-card-title">Published Articles ({articles.length})</h3>
+            <button 
+              className="cms-btn cms-btn-secondary cms-btn-small"
+              onClick={fetchArticles}
+              disabled={loadingArticles}
+            >
+              {loadingArticles ? 'Loading...' : 'Refresh'}
+            </button>
+          </div>
+
+          {loadingArticles ? (
+            <div className="cms-loading">
+              <div className="cms-spinner"></div>
+              Loading articles...
+            </div>
+          ) : fetchError ? (
+            <div className="cms-message cms-message-error">{fetchError}</div>
+          ) : articles.length === 0 ? (
+            <div className="cms-empty-state">
+              <div style={{ fontSize: '3em', marginBottom: '16px' }}></div>
+              <div>No articles published yet. Create your first article above!</div>
+            </div>
+          ) : (
+            <ul className="cms-list">
               {articles.map((article, idx) => (
-                <li key={article._id || idx} className="upload-article-list-item">
-                  <div className="upload-article-list-main">
-                    <strong>{article.title}</strong>
+                <li key={article._id || idx} className="cms-list-item">
+                  <div className="cms-list-item-content">
+                    <div className="cms-list-item-title">{article.title}</div>
                     {article.summary && (
-                      <span style={{ marginLeft: 8, color: '#555' }}>
-                        ({article.summary})
-                      </span>
+                      <div className="cms-list-item-meta" style={{ marginBottom: '4px' }}>
+                        {article.summary}
+                      </div>
                     )}
                     {article.content && (
-                      <span style={{ marginLeft: 8, color: '#888', fontSize: 13 }}>
-                        - {article.content.substring(0, 40)}{article.content.length > 40 ? '...' : ''}
-                      </span>
+                      <div className="cms-list-item-meta" style={{ fontStyle: 'italic' }}>
+                        {article.content.substring(0, 80)}
+                        {article.content.length > 80 ? '...' : ''}
+                      </div>
                     )}
-                    {article.imageUrl && (
-                      <span className="upload-article-image-wrapper">
-                        <img
-                          src={article.imageUrl.startsWith('http') ? article.imageUrl : `https://entyre-backend.onrender.com${article.imageUrl}`}
-                          alt=""
-                          className="upload-article-image"
-                        />
-                      </span>
+                    {article.createdAt && (
+                      <div className="cms-list-item-meta" style={{ marginTop: '8px', fontSize: '0.8em' }}>
+                        {new Date(article.createdAt).toLocaleDateString()}
+                      </div>
                     )}
                   </div>
-                  <button
-                    className="upload-article-edit-btn"
-                    onClick={() => handleEdit(article)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="upload-article-delete-btn"
-                    onClick={() => handleDelete(article._id)}
-                  >
-                    Delete
-                  </button>
+                  
+                  {article.imageUrl && (
+                    <div style={{ marginRight: '16px' }}>
+                      <img
+                        src={article.imageUrl.startsWith('http') 
+                          ? article.imageUrl 
+                          : `https://entyre-backend.onrender.com${article.imageUrl}`}
+                        alt=""
+                        style={{ 
+                          width: '60px', 
+                          height: '60px', 
+                          objectFit: 'cover',
+                          borderRadius: '8px',
+                          border: '1px solid #e2e8f0'
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  <div className="cms-list-item-actions">
+                    <button
+                      className="cms-btn cms-btn-warning cms-btn-small"
+                      onClick={() => handleEdit(article)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="cms-btn cms-btn-danger cms-btn-small"
+                      onClick={() => handleDelete(article._id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </li>
               ))}
             </ul>

@@ -6,19 +6,32 @@ const BASE_API = 'https://entyre-backend.onrender.com/api/banners';
 const UploadBanner = () => {
     const [title, setTitle] = useState('');
     const [image, setImage] = useState('');
-    const [file, setFile] = useState('');
+    const [file, setFile] = useState(null);
     const [fetchError, setFetchError] = useState('');
     const [message, setMessage] = useState('');
+    const [messageType, setMessageType] = useState('info');
     const [banners, setBanners] = useState([]);
     const [loadingBanners, setLoadingBanners] = useState(false);
     const [editingId, setEditingId] = useState(null);
+    const [uploading, setUploading] = useState(false);
+
+    const showMessage = (msg, type = 'info') => {
+        setMessage(msg);
+        setMessageType(type);
+        setTimeout(() => setMessage(''), 5000);
+    };
 
     const fetchBanners = () => {
         setLoadingBanners(true);
+        setFetchError('');
         fetch(BASE_API)
             .then(res => res.json())
             .then(data => {
                 setBanners(data);
+                setLoadingBanners(false);
+            })
+            .catch(err => {
+                setFetchError('Failed to load banners');
                 setLoadingBanners(false);
             });
     };
@@ -29,12 +42,12 @@ const UploadBanner = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setUploading(true);
 
         let url = BASE_API;
         let method = 'POST';
-        let body;
+        let body = new FormData();
 
-        body = new FormData();
         body.append('title', title);
         body.append('image', image);
         if (file) {
@@ -44,41 +57,44 @@ const UploadBanner = () => {
             url = `${BASE_API}/${editingId}`;
             method = 'PUT';
         }
+        
         try {
-            const res = await fetch(url, {
-                method,
-                body,
-            });
+            const res = await fetch(url, { method, body });
             if (!res.ok) throw new Error('Failed to save banner');
-            setMessage(editingId ? 'Banner updated!' : 'Banner uploaded!');
+            
+            showMessage(editingId ? 'Banner updated successfully!' : 'Banner uploaded successfully!', 'success');
             setTitle('');
             setImage('');
             setFile(null);
             setEditingId(null);
             fetchBanners();
-        } catch {
-            setMessage('Failed to upload banner');
+        } catch (err) {
+            showMessage('Failed to save banner. Please try again.', 'error');
+        } finally {
+            setUploading(false);
         }
     };
 
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this banner?')) return;
+        
         try {
-            const res = await fetch(`${BASE_API}/${id}`, { method: 'Delete' });
+            const res = await fetch(`${BASE_API}/${id}`, { method: 'DELETE' });
             if (!res.ok) throw new Error('Failed to delete');
-            setMessage('Banner deleted');
+            showMessage('Banner deleted successfully', 'success');
             fetchBanners();
-        } catch {
-            setMessage('Failed to delete banner');
+        } catch (err) {
+            showMessage('Failed to delete banner', 'error');
         }
     };
 
     const handleEdit = (banner) => {
         setTitle(banner.title);
-        setImage(banner.image);
+        setImage(banner.image || '');
         setFile(null);
         setEditingId(banner._id);
         setMessage('');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const handleCancelEdit = () => {
@@ -89,157 +105,198 @@ const UploadBanner = () => {
         setMessage('');
     };
 
-    // Inline styles to replace dashboard-related CSS
-    const containerStyle = {
-        maxWidth: 600,
-        margin: '2rem auto',
-        padding: 24,
-        background: '#fff',
-        borderRadius: 8,
-        boxShadow: '0 2px 12px rgba(0,0,0,0.08)'
+    const handleFileChange = (e) => {
+        const selectedFile = e.target.files[0];
+        setFile(selectedFile);
     };
-    const titleStyle = { marginBottom: 16 };
-    const statusStyle = { marginBottom: 16, color: '#555' };
-    const messageStyle = { marginBottom: 16, color: '#2a7ae4' };
-    const formGroupStyle = { marginBottom: 16 };
-    const labelStyle = { display: 'block', marginBottom: 6, fontWeight: 500 };
-    const inputStyle = { width: '100%', padding: 8, borderRadius: 4, border: '1px solid #ccc' };
-    const buttonStyle = {
-        background: '#2a7ae4',
-        color: '#fff',
-        border: 'none',
-        padding: '0.5rem 1.2rem',
-        borderRadius: 4,
-        cursor: 'pointer',
-        marginTop: 8
-    };
-    const cancelBtnStyle = {
-        ...buttonStyle,
-        marginLeft: 24,
-        background: '#888'
-    };
-    const selectedFileInfoStyle = { fontSize: 12, color: '#555', marginTop: 4 };
-    const removeFileBtnStyle = {
-        marginLeft: 8,
-        fontSize: 12,
-        background: 'none',
-        border: 'none',
-        color: '#e74c3c',
-        cursor: 'pointer'
-    };
-    const existingContainerStyle = { marginTop: 32, width: '100%', maxWidth: 600 };
-    const fetchErrorStyle = { color: 'red' };
-    const listItemStyle = { display: 'flex', alignItems: 'center', marginBottom: 8 };
-    const listMainStyle = { flex: 1 };
-    const imageWrapperStyle = { marginLeft: 8 };
-    const imageStyle = { maxWidth: 60, maxHeight: 40, verticalAlign: 'middle', marginLeft: 4 };
-    const editBtnStyle = {
-        marginLeft: 8,
-        fontSize: 12,
-        background: '#f1c40f',
-        color: '#222',
-        border: 'none',
-        borderRadius: 3,
-        padding: '2px 8px',
-        cursor: 'pointer'
-    };
-    const deleteBtnStyle = {
-        marginLeft: 8,
-        fontSize: 12,
-        color: '#fff',
-        background: '#e74c3c',
-        border: 'none',
-        borderRadius: 3,
-        padding: '2px 8px',
-        cursor: 'pointer'
+
+    const removeFile = () => {
+        setFile(null);
     };
 
     return (
-        <div>
+        <div className="cms-layout">
             <Navbar />
-            <div style={containerStyle}>
-                <h2 style={titleStyle}>{editingId ? 'Edit Banner' : 'Upload Banner'}</h2>
-                <div style={statusStyle}>
-                    {editingId ? 'Editing existing banner' : 'Upload your banner below'}
+            <div className="cms-main-content">
+                <div className="page-header">
+                    <h1 className="page-title">
+                        {editingId ? '✏️ Edit Banner' : '🖼️ Upload Banner'}
+                    </h1>
+                    <p className="page-subtitle">
+                        {editingId ? 'Update your existing banner' : 'Create eye-catching banners for your homepage'}
+                    </p>
                 </div>
-                {message && <div style={messageStyle}>{message}</div>}
-                <form onSubmit={handleSubmit} encType="multipart/form-data">
-                    <div style={formGroupStyle}>
-                        <label style={labelStyle}>Title</label>
-                        <input
-                            type="text"
-                            value={title}
-                            onChange={e => setTitle(e.target.value)}
-                            placeholder="Enter banner title"
-                            style={inputStyle}
-                            required
-                        />
-                    </div>
-                    <div style={formGroupStyle}>
-                        <label style={labelStyle}>Upload file (optional)</label>
-                        <input
-                            type="file"
-                            onChange={e => setFile(e.target.files[0])}
-                        />
-                        {file && (
-                            <div style={selectedFileInfoStyle}>
-                                Selected: {file.name}
-                                <button
-                                    type="button"
-                                    style={removeFileBtnStyle}
-                                    onClick={() => setFile(null)}
-                                >
-                                    Remove
-                                </button>
-                            </div>
+
+                {/* Upload Form */}
+                <div className="cms-card">
+                    <div className="cms-card-header">
+                        <h3 className="cms-card-title">Banner Details</h3>
+                        {editingId && (
+                            <span style={{ 
+                                background: '#fef3c7', 
+                                color: '#92400e', 
+                                padding: '4px 8px', 
+                                borderRadius: '12px', 
+                                fontSize: '0.8em',
+                                fontWeight: '500'
+                            }}>
+                                Editing Mode
+                            </span>
                         )}
                     </div>
-                    <button type="submit" style={buttonStyle}>
-                        {editingId ? 'Update Banner' : 'Upload Banner'}
-                    </button>
-                    {editingId && (
-                        <button
-                            type="button"
-                            style={cancelBtnStyle}
-                            onClick={handleCancelEdit}
-                        >
-                            Cancel Edit
-                        </button>
+
+                    {message && (
+                        <div className={`cms-message cms-message-${messageType}`}>
+                            {messageType === 'success' && '✅ '}
+                            {messageType === 'error' && '❌ '}
+                            {messageType === 'info' && 'ℹ️ '}
+                            {message}
+                        </div>
                     )}
-                </form>
-                <div style={existingContainerStyle}>
-                    <h3>Existing Banners</h3>
-                    {loadingBanners && <div>Loading banners...</div>}
-                    {fetchError && <div style={fetchErrorStyle}>{fetchError}</div>}
-                    {!loadingBanners && !fetchError && (
-                        <ul style={{ padding: 0, listStyle: 'none' }}>
-                            {banners.length === 0 && <li>No banners found.</li>}
+
+                    <form onSubmit={handleSubmit} encType="multipart/form-data">
+                        <div className="cms-form-group">
+                            <label className="cms-form-label">Banner Title *</label>
+                            <input
+                                type="text"
+                                value={title}
+                                onChange={e => setTitle(e.target.value)}
+                                placeholder="Enter banner title"
+                                className="cms-form-input"
+                                required
+                            />
+                        </div>
+
+                        <div className="cms-form-group">
+                            <label className="cms-form-label">Banner Image</label>
+                            {!file ? (
+                                <div 
+                                    className="cms-file-upload"
+                                    onClick={() => document.getElementById('banner-file-input').click()}
+                                >
+                                    <div style={{ fontSize: '2em', marginBottom: '8px' }}>🖼️</div>
+                                    <div style={{ fontWeight: '600', marginBottom: '4px' }}>Click to upload banner image</div>
+                                    <div style={{ fontSize: '0.9em', color: '#64748b' }}>
+                                        PNG, JPG, GIF up to 10MB • Recommended: 1920x600px
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="cms-file-upload has-file">
+                                    <div style={{ fontSize: '1.5em', marginBottom: '8px' }}>✅</div>
+                                    <div className="cms-file-info">
+                                        <span>🖼️ {file.name}</span>
+                                        <button
+                                            type="button"
+                                            className="cms-file-remove"
+                                            onClick={removeFile}
+                                        >
+                                            ❌ Remove
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                            <input
+                                id="banner-file-input"
+                                type="file"
+                                onChange={handleFileChange}
+                                accept="image/*"
+                                style={{ display: 'none' }}
+                            />
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+                            <button 
+                                type="submit" 
+                                className="cms-btn cms-btn-primary"
+                                disabled={uploading}
+                                style={{ flex: 1 }}
+                            >
+                                {uploading ? '⏳ Uploading...' : (editingId ? '💾 Update Banner' : '🚀 Upload Banner')}
+                            </button>
+                            
+                            {editingId && (
+                                <button
+                                    type="button"
+                                    className="cms-btn cms-btn-secondary"
+                                    onClick={handleCancelEdit}
+                                >
+                                    ❌ Cancel
+                                </button>
+                            )}
+                        </div>
+                    </form>
+                </div>
+
+                {/* Banners List */}
+                <div className="cms-card">
+                    <div className="cms-card-header">
+                        <h3 className="cms-card-title">Published Banners ({banners.length})</h3>
+                        <button 
+                            className="cms-btn cms-btn-secondary cms-btn-small"
+                            onClick={fetchBanners}
+                            disabled={loadingBanners}
+                        >
+                            {loadingBanners ? '⏳' : '🔄'} Refresh
+                        </button>
+                    </div>
+                    
+                    {loadingBanners ? (
+                        <div className="cms-loading">
+                            <div className="cms-spinner"></div>
+                            Loading banners...
+                        </div>
+                    ) : fetchError ? (
+                        <div className="cms-message cms-message-error">{fetchError}</div>
+                    ) : banners.length === 0 ? (
+                        <div className="cms-empty-state">
+                            <div style={{ fontSize: '3em', marginBottom: '16px' }}>🖼️</div>
+                            <div>No banners uploaded yet. Create your first banner above!</div>
+                        </div>
+                    ) : (
+                        <ul className="cms-list">
                             {banners.map((banner, idx) => (
-                                <li key={banner._id || idx} style={listItemStyle}>
-                                    <div style={listMainStyle}>
-                                        <strong>{banner.title}</strong>
-                                        {banner.imageUrl && (
-                                            <span style={imageWrapperStyle}>
-                                                <img
-                                                    src={banner.imageUrl.startsWith('http') ? banner.imageUrl : `https://entyre-backend.onrender.com${banner.imageUrl}`}
-                                                    alt=""
-                                                    style={imageStyle}
-                                                />
-                                            </span>
+                                <li key={banner._id || idx} className="cms-list-item">
+                                    <div className="cms-list-item-content">
+                                        <div className="cms-list-item-title">{banner.title}</div>
+                                        {banner.createdAt && (
+                                            <div className="cms-list-item-meta">
+                                                📅 {new Date(banner.createdAt).toLocaleDateString()}
+                                            </div>
                                         )}
                                     </div>
-                                    <button
-                                        style={editBtnStyle}
-                                        onClick={() => handleEdit(banner)}
-                                    >
-                                        Edit
-                                    </button>
-                                    <button
-                                        style={deleteBtnStyle}
-                                        onClick={() => handleDelete(banner._id)}
-                                    >
-                                        Delete
-                                    </button>
+                                    
+                                    {banner.imageUrl && (
+                                        <div style={{ marginRight: '16px' }}>
+                                            <img
+                                                src={banner.imageUrl.startsWith('http') 
+                                                    ? banner.imageUrl 
+                                                    : `https://entyre-backend.onrender.com${banner.imageUrl}`}
+                                                alt=""
+                                                style={{ 
+                                                    width: '120px', 
+                                                    height: '60px', 
+                                                    objectFit: 'cover',
+                                                    borderRadius: '8px',
+                                                    border: '1px solid #e2e8f0'
+                                                }}
+                                            />
+                                        </div>
+                                    )}
+
+                                    <div className="cms-list-item-actions">
+                                        <button
+                                            className="cms-btn cms-btn-warning cms-btn-small"
+                                            onClick={() => handleEdit(banner)}
+                                        >
+                                            ✏️ Edit
+                                        </button>
+                                        <button
+                                            className="cms-btn cms-btn-danger cms-btn-small"
+                                            onClick={() => handleDelete(banner._id)}
+                                        >
+                                            🗑️ Delete
+                                        </button>
+                                    </div>
                                 </li>
                             ))}
                         </ul>
