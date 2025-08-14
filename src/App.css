@@ -1,0 +1,408 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+/* login page */
+.login-page-bg {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f6fa;
+  z-index: 0;
+}
+
+.login-form-container {
+  background: #fff;
+  padding: 2rem 2.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  min-width: 320px;
+}
+
+.login-form-title {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.login-form-error {
+  color: red;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.login-form-group {
+  margin-bottom: 1rem;
+}
+
+.login-form-group:last-of-type {
+  margin-bottom: 1.5rem;
+}
+
+.login-form-label {
+  text-align: left;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.login-form-input {
+  width: 90%;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.login-form-button {
+  width: 100%;
+  padding: 0.75rem;
+  background: #646cff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Navbar */
+.cms-navbar {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 220px;
+  min-height: 100vh;
+  background-color: #333;
+  color: white;
+  padding: 24px 0;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 100;
+}
+
+.cms-navbar-logo {
+  margin: 0 0 32px 0;
+  text-align: center;
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.cms-navbar-links {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  flex: 1;
+  align-items: stretch;
+  margin-bottom: 32px;
+}
+
+.cms-navbar-link {
+  color: white;
+  text-decoration: none;
+  padding: 10px 24px;
+  border-radius: 4px;
+  transition: background 0.15s;
+  font-size: 1em;
+}
+
+.cms-navbar-link:hover,
+.cms-navbar-link.active {
+  background: #444;
+}
+
+.cms-navbar-logout {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 0 24px;
+  font-size: 1em;
+  transition: background 0.15s;
+}
+
+.cms-navbar-logout:hover {
+  background-color: #e60000;
+}
+
+.cms-navbar-dropdown-header{
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+/* articleupload page */
+.upload-article-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 24px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+.upload-article-title {
+  margin-bottom: 16px;
+}
+.upload-article-status {
+  margin-bottom: 16px;
+  color: #555;
+}
+.upload-article-message {
+  margin-bottom: 16px;
+  color: #2a7ae4;
+}
+.upload-article-form-group {
+  margin-bottom: 16px;
+}
+.upload-article-label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+.upload-article-input,
+.upload-article-textarea {
+  width: 100%;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+.upload-article-textarea {
+  min-height: 120px;
+}
+.upload-btn {
+  background: #2a7ae4;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1.2rem;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 8px;
+}
+.upload-article-btn-cancel {
+  background: #888;
+  margin-left: 24px;
+}
+.upload-article-selected-file {
+  font-size: 12px;
+  color: #555;
+  margin-top: 4px;
+}
+.upload-article-remove-file-btn {
+  margin-left: 8px;
+  font-size: 12px;
+  background: none;
+  border: none;
+  color: #e74c3c;
+  cursor: pointer;
+}
+.upload-article-existing-container {
+  margin-top: 32px;
+  width: 100%;
+  max-width: 600px;
+}
+.upload-article-fetch-error {
+  color: red;
+}
+.upload-article-list-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.upload-article-list-main {
+  flex: 1;
+}
+.upload-article-image-wrapper {
+  margin-left: 8px;
+}
+.upload-article-image {
+  max-width: 60px;
+  max-height: 40px;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+.upload-article-edit-btn {
+  margin-left: 8px;
+  font-size: 12px;
+  background: #f1c40f;
+  color: #222;
+  border: none;
+  border-radius: 3px;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+.upload-article-delete-btn {
+  margin-left: 8px;
+  font-size: 12px;
+  color: #fff;
+  background: #e74c3c;
+  border: none;
+  border-radius: 3px;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+
+/* workflow page */
+.workflow-cms-content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px;
+  margin-left: 200px;
+}
+
+.node-editor, .connection-editor {
+  border: 1px solid #eee;
+  padding: 8px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  margin: 20px;
+}
+.node-editor label,
+.connection-editor label {
+  margin-left: 0;
+}
+.node-editor label + label,
+.connection-editor label + label {
+  margin-left: 8px;
+}
+.node-editor input[type="text"],
+.node-editor input:not([type]),
+.node-editor input[type="number"],
+.node-editor input[type="url"] {
+  width: 120px;
+}
+.node-editor input.node-label {
+  width: 120px;
+}
+.node-editor input.node-icon {
+  width: 100px;
+}
+.node-editor input.node-type {
+  width: 100px;
+}
+.node-editor input.node-detail {
+  width: 300px;
+}
+.node-editor .icon-upload-btn {
+  margin-left: 4px;
+}
+.node-editor .icon-img {
+  margin-left: 8px;
+  width: 24px;
+  height: 24px;
+}
+.node-editor .icon-error {
+  color: red;
+  margin-left: 8px;
+}
+.node-editor .remove-btn {
+  margin-left: 12px;
+  color: red;
+}
+.connection-editor input.conn-from,
+.connection-editor input.conn-to {
+  width: 100px;
+}
+.connection-editor input.conn-sourceHandle,
+.connection-editor input.conn-targetHandle,
+.connection-editor input.conn-edgeType {
+  width: 80px;
+}
+.connection-editor select.conn-edgeStyle {
+  width: 110px;
+}
+.connection-editor .remove-btn {
+  margin-left: 12px;
+  color: red;
+}
+.node-positions-editor {
+  margin-bottom: 12px;
+  margin-left: 20px;
+}
+.node-positions-editor .node-pos-row {
+  margin-bottom: 4px;
+}
+.node-positions-editor .node-pos-id {
+  font-weight: 500;
+}
+.node-positions-editor .remove-btn {
+  margin-left: 8px;
+  color: red;
+}
+.node-positions-editor .add-update-row {
+  margin-top: 6px;
+}
+.node-positions-editor .add-update-row input {
+  width: 80px;
+}
+.node-positions-editor .add-update-row input.x,
+.node-positions-editor .add-update-row input.y {
+  width: 50px;
+  margin-left: 4px;
+}
+.node-positions-editor .add-update-row button {
+  margin-left: 8px;
+}
+.workflow-cms-create-btn {
+  margin-bottom: 16px;
+  margin-left: 20px;
+}
+.workflow-cms-error {
+  color: red;
+  margin-left: 20px;
+}
+.workflow-list-table .delete-btn {
+  margin-left: 8px;
+  color: red;
+}
+.workflow-editor-form {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 24px;
+  margin-left: 20px;
+}
+.workflow-editor-form .section {
+  margin-top: 16px;
+}
+.workflow-editor-form .cancel-btn {
+  margin-left: 8px;
+}
