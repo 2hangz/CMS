@@ -1,11 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "./navbar";
 
-import WorkflowPreview from "./workflow/WorkflowPreview";
-import NodeEditor from "./workflow/NodeEditor";
-import NodeListTable from "./workflow/NodeListTable";
-import ConnectionEditor from "./workflow/ConnectionEditor";
-import NodePositionsEditor from "./workflow/NodePositionsEditor";
 import WorkflowList from "./workflow/WorkflowList";
 import WorkflowEditor from "./workflow/WorkflowEditor";
 
@@ -117,7 +112,7 @@ function WorkflowCMS() {
                   className="cms-btn cms-btn-primary"
                   onClick={() => setEditing({
                     name: "",
-                    status: "Draft",
+                    status: "Verified",
                     description: "",
                     nodes: [],
                     connections: [],

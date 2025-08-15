@@ -79,7 +79,6 @@ function WorkflowEditor({ workflow, onSave, onCancel, selectedNodeId, onNodeSele
       selectable: true 
     };
     setForm({ ...form, nodes: [...(form.nodes || []), newNode] });
-    // 选中新加的node并弹窗
     setTimeout(() => {
       onNodeSelect(newId);
     }, 0);
@@ -187,12 +186,12 @@ function WorkflowEditor({ workflow, onSave, onCancel, selectedNodeId, onNodeSele
                 <label className="cms-form-label">Status</label>
                 <select 
                   className="cms-form-select"
-                  value={form.status || "Draft"} 
+                  value={form.status || "Verified"} 
                   onChange={e => setForm({ ...form, status: e.target.value })}
                 >
-                  <option value="Draft">Draft</option>
-                  <option value="Active">Active</option>
-                  <option value="Archived">Archived</option>
+                  <option value="Verified">Verified</option>
+                  <option value="Researching">Researching</option>
+                  <option value="Out of Scope">Out of Scope</option>
                 </select>
               </div>
               
