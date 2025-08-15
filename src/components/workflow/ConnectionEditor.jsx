@@ -76,7 +76,7 @@ function ConnectionEditor({ conn, onChange, onRemove, allNodeIds = [] }) {
               value={conn.edgeStyle || ""}
               onChange={e => update("edgeStyle", e.target.value)}
             >
-              <option value="">Default</option>
+              <option value="default">Default</option>
               <option value="redDashed">Red Dashed</option>
               <option value="redSolid">Red Solid</option>
               <option value="grayDashed">Gray Dashed</option>

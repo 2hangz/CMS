@@ -137,7 +137,7 @@ const Login = () => {
               e.target.style.background = 'transparent';
             }}
           >
-            🎯 Use Demo Credentials
+            Use Demo Credentials
           </button>
         </form>
 

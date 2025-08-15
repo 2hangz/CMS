@@ -120,7 +120,7 @@ const UploadBanner = () => {
             <div className="cms-main-content">
                 <div className="page-header">
                     <h1 className="page-title">
-                        {editingId ? '✏️ Edit Banner' : '🖼️ Upload Banner'}
+                        {editingId ? 'Edit Banner' : 'Upload Banner'}
                     </h1>
                     <p className="page-subtitle">
                         {editingId ? 'Update your existing banner' : 'Create eye-catching banners for your homepage'}
@@ -147,9 +147,9 @@ const UploadBanner = () => {
 
                     {message && (
                         <div className={`cms-message cms-message-${messageType}`}>
-                            {messageType === 'success' && '✅ '}
-                            {messageType === 'error' && '❌ '}
-                            {messageType === 'info' && 'ℹ️ '}
+                            {messageType === 'success' && ''}
+                            {messageType === 'error' && ''}
+                            {messageType === 'info' && ''}
                             {message}
                         </div>
                     )}
@@ -174,7 +174,7 @@ const UploadBanner = () => {
                                     className="cms-file-upload"
                                     onClick={() => document.getElementById('banner-file-input').click()}
                                 >
-                                    <div style={{ fontSize: '2em', marginBottom: '8px' }}>🖼️</div>
+                                    <div style={{ fontSize: '2em', marginBottom: '8px' }}></div>
                                     <div style={{ fontWeight: '600', marginBottom: '4px' }}>Click to upload banner image</div>
                                     <div style={{ fontSize: '0.9em', color: '#64748b' }}>
                                         PNG, JPG, GIF up to 10MB • Recommended: 1920x600px
@@ -182,15 +182,15 @@ const UploadBanner = () => {
                                 </div>
                             ) : (
                                 <div className="cms-file-upload has-file">
-                                    <div style={{ fontSize: '1.5em', marginBottom: '8px' }}>✅</div>
+                                    <div style={{ fontSize: '1.5em', marginBottom: '8px' }}></div>
                                     <div className="cms-file-info">
-                                        <span>🖼️ {file.name}</span>
+                                        <span>{file.name}</span>
                                         <button
                                             type="button"
                                             className="cms-file-remove"
                                             onClick={removeFile}
                                         >
-                                            ❌ Remove
+                                            Remove
                                         </button>
                                     </div>
                                 </div>
@@ -211,7 +211,7 @@ const UploadBanner = () => {
                                 disabled={uploading}
                                 style={{ flex: 1 }}
                             >
-                                {uploading ? '⏳ Uploading...' : (editingId ? '💾 Update Banner' : '🚀 Upload Banner')}
+                                {uploading ? 'Uploading...' : (editingId ? 'Update Banner' : 'Upload Banner')}
                             </button>
                             
                             {editingId && (
@@ -220,7 +220,7 @@ const UploadBanner = () => {
                                     className="cms-btn cms-btn-secondary"
                                     onClick={handleCancelEdit}
                                 >
-                                    ❌ Cancel
+                                    Cancel
                                 </button>
                             )}
                         </div>
@@ -236,7 +236,7 @@ const UploadBanner = () => {
                             onClick={fetchBanners}
                             disabled={loadingBanners}
                         >
-                            {loadingBanners ? '⏳' : '🔄'} Refresh
+                            {loadingBanners ? 'Loading...' : 'Refresh'}
                         </button>
                     </div>
                     
@@ -249,7 +249,7 @@ const UploadBanner = () => {
                         <div className="cms-message cms-message-error">{fetchError}</div>
                     ) : banners.length === 0 ? (
                         <div className="cms-empty-state">
-                            <div style={{ fontSize: '3em', marginBottom: '16px' }}>🖼️</div>
+                            <div style={{ fontSize: '3em', marginBottom: '16px' }}></div>
                             <div>No banners uploaded yet. Create your first banner above!</div>
                         </div>
                     ) : (
@@ -260,7 +260,7 @@ const UploadBanner = () => {
                                         <div className="cms-list-item-title">{banner.title}</div>
                                         {banner.createdAt && (
                                             <div className="cms-list-item-meta">
-                                                📅 {new Date(banner.createdAt).toLocaleDateString()}
+                                                {new Date(banner.createdAt).toLocaleDateString()}
                                             </div>
                                         )}
                                     </div>
@@ -288,13 +288,13 @@ const UploadBanner = () => {
                                             className="cms-btn cms-btn-warning cms-btn-small"
                                             onClick={() => handleEdit(banner)}
                                         >
-                                            ✏️ Edit
+                                            Edit
                                         </button>
                                         <button
                                             className="cms-btn cms-btn-danger cms-btn-small"
                                             onClick={() => handleDelete(banner._id)}
                                         >
-                                            🗑️ Delete
+                                            Delete
                                         </button>
                                     </div>
                                 </li>
