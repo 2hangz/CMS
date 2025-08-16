@@ -48,7 +48,7 @@ function Navbar() {
           >
             <span className="cms-navbar-dropdown-header">
               <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span></span>
+                <span>🏠</span>
                 <span>Homepage</span>
               </span>
               <span style={{ transition: 'transform 0.2s', transform: showHomepageSubmenu ? 'rotate(90deg)' : 'rotate(0deg)' }}>
@@ -63,16 +63,24 @@ function Navbar() {
                 className={`cms-navbar-link ${isActive('/upload-banner') ? 'active' : ''}`}
                 style={{ fontSize: '0.9em', padding: '8px 12px' }}
               >
-                <span style={{ marginRight: '8px' }}></span>
+                <span style={{ marginRight: '8px' }}>🖼️</span>
                 Upload Banner
+              </Link>
+              <Link 
+                to="/seed-home-content" 
+                className={`cms-navbar-link ${isActive('/seed-home-content') ? 'active' : ''}`}
+                style={{ fontSize: '0.9em', padding: '8px 12px' }}
+              >
+                <span style={{ marginRight: '8px' }}>🌱</span>
+                Seed Home Content
               </Link>
               <Link 
                 to="/upload-markdown" 
                 className={`cms-navbar-link ${isActive('/upload-markdown') ? 'active' : ''}`}
                 style={{ fontSize: '0.9em', padding: '8px 12px' }}
               >
-                <span style={{ marginRight: '8px' }}></span>
-                Homepage Content
+                <span style={{ marginRight: '8px' }}>✏️</span>
+                Edit Content
               </Link>
             </div>
           )}
@@ -91,7 +99,7 @@ function Navbar() {
           >
             <span className="cms-navbar-dropdown-header">
               <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span></span>
+                <span>📊</span>
                 <span>Outputs</span>
               </span>
               <span style={{ transition: 'transform 0.2s', transform: showOutputpageSubmenu ? 'rotate(90deg)' : 'rotate(0deg)' }}>
@@ -106,7 +114,7 @@ function Navbar() {
                 className={`cms-navbar-link ${isActive('/upload-article') ? 'active' : ''}`}
                 style={{ fontSize: '0.9em', padding: '8px 12px' }}
               >
-                <span style={{ marginRight: '8px' }}></span>
+                <span style={{ marginRight: '8px' }}>📝</span>
                 Upload Article
               </Link>
               <Link 
@@ -114,7 +122,7 @@ function Navbar() {
                 className={`cms-navbar-link ${isActive('/upload-video') ? 'active' : ''}`}
                 style={{ fontSize: '0.9em', padding: '8px 12px' }}
               >
-                <span style={{ marginRight: '8px' }}></span>
+                <span style={{ marginRight: '8px' }}>🎥</span>
                 Upload Video
               </Link>
             </div>
@@ -134,7 +142,7 @@ function Navbar() {
           >
             <span className="cms-navbar-dropdown-header">
               <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span></span>
+                <span>🔄</span>
                 <span>Workflow</span>
               </span>
               <span style={{ transition: 'transform 0.2s', transform: showWorkflowSubmenu ? 'rotate(90deg)' : 'rotate(0deg)' }}>
@@ -149,7 +157,7 @@ function Navbar() {
                 className={`cms-navbar-link ${isActive('/upload-workflow') ? 'active' : ''}`}
                 style={{ fontSize: '0.9em', padding: '8px 12px' }}
               >
-                <span style={{ marginRight: '8px' }}></span>
+                <span style={{ marginRight: '8px' }}>⚙️</span>
                 Manage Workflows
               </Link>
             </div>
@@ -158,7 +166,7 @@ function Navbar() {
       </div>
 
       <button onClick={handleLogout} className="cms-navbar-logout">
-        <span style={{ marginRight: '8px' }}></span>
+        <span style={{ marginRight: '8px' }}>🚪</span>
         Logout
       </button>
     </nav>
