@@ -280,21 +280,16 @@ export const AuthProvider = ({ children, apiBaseUrl = 'https://entyre-backend.on
 
   // Auth context value
   const value = {
-    // State
     user: state.user,
     token: state.token,
     isAuthenticated: state.isAuthenticated,
     isLoading: state.isLoading,
     error: state.error,
-
-    // Actions
     login,
     logout,
     clearAuth,
     verifyToken,
     clearError,
-
-    // Utilities
     getAuthHeaders,
     apiRequest
   };
@@ -304,7 +299,7 @@ export const AuthProvider = ({ children, apiBaseUrl = 'https://entyre-backend.on
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
 // Hook to use auth context
 export const useAuth = () => {
