@@ -7,7 +7,6 @@ import UploadBanner from "./components/uploadBanner";
 import Home from "./pages/home";
 import CMSContentEditor from "./components/uploadHomeContent";
 import WorkflowCMS from "./components/workflow";
-import { AuthProvider } from "./pages/contexts/AuthContext";
 
 // Protected Route Component
 function ProtectedRoute({ children }) {
