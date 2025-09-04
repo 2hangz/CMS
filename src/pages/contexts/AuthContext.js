@@ -280,18 +280,22 @@ export const AuthProvider = ({ children, apiBaseUrl = 'https://entyre-backend.on
 
   // Auth context value
   const value = {
+    // State
     user: state.user,
     token: state.token,
     isAuthenticated: state.isAuthenticated,
     isLoading: state.isLoading,
     error: state.error,
+
+    // Actions
     login,
     logout,
     clearAuth,
     verifyToken,
     clearError,
+
     getAuthHeaders,
-    apiRequest
+    apiRequest,
   };
 
   return (
@@ -303,12 +307,12 @@ export const AuthProvider = ({ children, apiBaseUrl = 'https://entyre-backend.on
 
 // Hook to use auth context
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+    const context = useContext(AuthContext);
+    if (!context) {
+      throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context;
+  };
 
 // HOC for protected components
 export const withAuth = (Component) => {
