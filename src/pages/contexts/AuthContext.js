@@ -99,13 +99,20 @@ class MemoryStorage {
 }
 
 // Use memory storage instead of localStorage for artifacts
-const storage = typeof window !== 'undefined' && window.localStorage 
-  ? window.localStorage 
+const storage = typeof window !== 'undefined' && window.localStorage
+  ? window.localStorage
   : new MemoryStorage();
 
 // AuthProvider component
 export const AuthProvider = ({ children, apiBaseUrl = 'https://entyre-backend.onrender.com/api' }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
+
+  // Clear authentication data
+  const clearAuth = () => {
+    storage.removeItem('token');
+    storage.removeItem('user');
+    dispatch({ type: AUTH_ACTIONS.LOGOUT });
+  };
 
   // Load stored auth data on mount
   useEffect(() => {
@@ -129,6 +136,7 @@ export const AuthProvider = ({ children, apiBaseUrl = 'https://entyre-backend.on
     };
 
     loadStoredAuth();
+    // eslint-disable-next-line
   }, []);
 
   // Helper function to get auth headers
@@ -153,12 +161,11 @@ export const AuthProvider = ({ children, apiBaseUrl = 'https://entyre-backend.on
         credentials: 'include'
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Login failed');
-      }
-
       const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Login failed');
+      }
 
       // Store auth data
       storage.setItem('token', data.token);
@@ -201,13 +208,6 @@ export const AuthProvider = ({ children, apiBaseUrl = 'https://entyre-backend.on
     }
   };
 
-  // Clear authentication data
-  const clearAuth = () => {
-    storage.removeItem('token');
-    storage.removeItem('user');
-    dispatch({ type: AUTH_ACTIONS.LOGOUT });
-  };
-
   // Verify token validity
   const verifyToken = async () => {
     if (!state.token) return false;
@@ -218,12 +218,13 @@ export const AuthProvider = ({ children, apiBaseUrl = 'https://entyre-backend.on
         credentials: 'include'
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
         clearAuth();
         return false;
       }
 
-      const data = await response.json();
       if (data.valid) {
         dispatch({ type: AUTH_ACTIONS.SET_USER, payload: data.user });
         return true;
@@ -241,15 +242,14 @@ export const AuthProvider = ({ children, apiBaseUrl = 'https://entyre-backend.on
   // Make authenticated API requests
   const apiRequest = async (endpoint, options = {}) => {
     const url = endpoint.startsWith('http') ? endpoint : `${apiBaseUrl}${endpoint}`;
-    
+
     const config = {
-      headers: getAuthHeaders(),
-      credentials: 'include',
       ...options,
       headers: {
         ...getAuthHeaders(),
-        ...options.headers
-      }
+        ...(options.headers || {})
+      },
+      credentials: 'include'
     };
 
     try {
@@ -303,16 +303,16 @@ export const AuthProvider = ({ children, apiBaseUrl = 'https://entyre-backend.on
       {children}
     </AuthContext.Provider>
   );
-}
+};
 
 // Hook to use auth context
 export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (!context) {
-      throw new Error('useAuth must be used within an AuthProvider');
-    }
-    return context;
-  };
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
 // HOC for protected components
 export const withAuth = (Component) => {
@@ -321,11 +321,11 @@ export const withAuth = (Component) => {
 
     if (isLoading) {
       return (
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          height: '100vh' 
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh'
         }}>
           <div>Loading...</div>
         </div>
@@ -334,11 +334,11 @@ export const withAuth = (Component) => {
 
     if (!isAuthenticated) {
       return (
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          height: '100vh' 
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh'
         }}>
           <div>Please log in to access this page.</div>
         </div>
@@ -355,11 +355,11 @@ export const ProtectedRoute = ({ children, fallback = null }) => {
 
   if (isLoading) {
     return fallback || (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh' 
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh'
       }}>
         <div>Loading...</div>
       </div>
@@ -368,11 +368,11 @@ export const ProtectedRoute = ({ children, fallback = null }) => {
 
   if (!isAuthenticated) {
     return fallback || (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh' 
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh'
       }}>
         <div>Authentication required</div>
       </div>
