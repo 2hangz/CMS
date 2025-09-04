@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from './contexts/AuthContext';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -7,6 +8,14 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/home');
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,17 +34,57 @@ const Login = () => {
       return;
     }
 
-    // Simulate loading delay for better UX
-    await new Promise(resolve => setTimeout(resolve, 500));
+    try {
+      // Real API call to your backend
+      const response = await fetch('https://entyre-backend.onrender.com/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username.trim(),
+          password: password.trim()
+        }),
+        credentials: 'include'
+      });
 
-    // Demo: hardcoded login
-    if (username === 'admin' && password === '1234') {
-      localStorage.setItem('token', 'demo-token');
-      navigate('/home');
-    } else {
-      setError('Invalid username or password. Try admin/1234');
+      const data = await response.json();
+
+      if (response.ok) {
+        // Store the token
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+        }
+        
+        // Store user info if provided
+        if (data.user) {
+          localStorage.setItem('user', JSON.stringify(data.user));
+        }
+
+        // Navigate to home
+        navigate('/home');
+      } else {
+        // Handle error response
+        setError(data.message || data.error || 'Login failed. Please check your credentials.');
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      
+      // If API is not available, fall back to demo credentials
+      if (username === 'admin' && password === '1234') {
+        localStorage.setItem('token', 'demo-token-' + Date.now());
+        localStorage.setItem('user', JSON.stringify({ 
+          username: 'admin', 
+          role: 'admin',
+          demo: true 
+        }));
+        navigate('/home');
+      } else {
+        setError('Unable to connect to server. Try demo credentials: admin/1234');
+      }
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const fillDemoCredentials = () => {
@@ -57,7 +106,7 @@ const Login = () => {
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text'
           }}>
-            {/* Removed emoji */}
+            🔐
           </div>
           <h2 className="login-form-title">ENTYRE CMS</h2>
           <p style={{ 
@@ -88,6 +137,7 @@ const Login = () => {
               className="login-form-input"
               placeholder="Enter your username"
               disabled={loading}
+              autoComplete="username"
             />
           </div>
 
@@ -102,6 +152,7 @@ const Login = () => {
               className="login-form-input"
               placeholder="Enter your password"
               disabled={loading}
+              autoComplete="current-password"
             />
           </div>
 
@@ -126,7 +177,8 @@ const Login = () => {
               borderRadius: '8px',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
-              fontWeight: '500'
+              fontWeight: '500',
+              marginTop: '12px'
             }}
             onMouseOver={(e) => {
               e.target.style.borderColor = '#cbd5e1';

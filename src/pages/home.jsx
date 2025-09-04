@@ -91,6 +91,13 @@ export default function Home() {
       icon: '',
       color: '#06b6d4',
       path: '/upload-markdown'
+    },
+    {
+      title: 'Edit Homepage CMS',
+      description: 'Update homepage content',
+      icon: '',
+      color: '#06b6d4',
+      path: '/CMS'
     }
   ];
 

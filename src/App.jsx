@@ -6,8 +6,8 @@ import UploadVideo from "./components/uploadVideo";
 import UploadBanner from "./components/uploadBanner";
 import Home from "./pages/home";
 import CMSContentEditor from "./components/uploadHomeContent";
-import HomeContentSeeder from "./components/HomeContentSeeder"; // New component
 import WorkflowCMS from "./components/workflow";
+import { AuthProvider } from "./pages/contexts/AuthContext";
 
 // Protected Route Component
 function ProtectedRoute({ children }) {
@@ -50,14 +50,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <CMSContentEditor />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/seed-home-content" 
-            element={
-              <ProtectedRoute>
-                <HomeContentSeeder />
               </ProtectedRoute>
             } 
           />

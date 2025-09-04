@@ -1,15 +1,55 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [showHomepageSubmenu, setShowHomepageSubmenu] = useState(false);
-  const [showOutputpageSubmenu, setShowOutputpageSubmenu] = useState(false);
-  const [showWorkflowSubmenu, setShowWorkflowSubmenu] = useState(false);
+
+  const getInitialState = (key) => {
+    const value = localStorage.getItem(key);
+    return value === "true" ? true : false;
+  };
+
+  const [showHomepageSubmenu, setShowHomepageSubmenu] = useState(() => getInitialState("showHomepageSubmenu"));
+  const [showOutputpageSubmenu, setShowOutputpageSubmenu] = useState(() => getInitialState("showOutputpageSubmenu"));
+  const [showWorkflowSubmenu, setShowWorkflowSubmenu] = useState(() => getInitialState("showWorkflowSubmenu"));
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    localStorage.setItem("showHomepageSubmenu", showHomepageSubmenu);
+  }, [showHomepageSubmenu]);
+
+  useEffect(() => {
+    localStorage.setItem("showOutputpageSubmenu", showOutputpageSubmenu);
+  }, [showOutputpageSubmenu]);
+
+  useEffect(() => {
+    localStorage.setItem("showWorkflowSubmenu", showWorkflowSubmenu);
+  }, [showWorkflowSubmenu]);
+
+  // Load user info from localStorage
+  useEffect(() => {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      try {
+        setUser(JSON.parse(userData));
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+      }
+    }
+  }, []);
 
   const handleLogout = () => {
+    // Clear all auth-related data
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    
+    // Clear menu state
+    localStorage.removeItem("showHomepageSubmenu");
+    localStorage.removeItem("showOutputpageSubmenu");
+    localStorage.removeItem("showWorkflowSubmenu");
+    
+    // Navigate to login
     navigate("/login");
   };
 
@@ -30,145 +70,126 @@ function Navbar() {
   return (
     <nav className="cms-navbar">
       <div className="cms-navbar-logo">
-        <div style={{ fontSize: '1.2em', marginBottom: '4px' }}></div>
-        ENTYRE CMS
+        <Link to="/home" style={{ textDecoration: 'none', color: 'inherit' }}>
+          ENTYRE CMS
+        </Link>
       </div>
       
       <div className="cms-navbar-links">
         {/* Homepage Section */}
-        <div>
-          <span
-            className="cms-navbar-link cms-navbar-dropdown-title"
+        <div className="cms-navbar-section">
+          <div
+            className="cms-navbar-dropdown-title"
             onClick={handleHomepageClick}
             tabIndex={0}
-            style={{ cursor: "pointer" }}
             onKeyDown={e => {
               if (e.key === "Enter" || e.key === " ") handleHomepageClick();
             }}
           >
             <span className="cms-navbar-dropdown-header">
-              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span>🏠</span>
-                <span>Homepage</span>
-              </span>
-              <span style={{ transition: 'transform 0.2s', transform: showHomepageSubmenu ? 'rotate(90deg)' : 'rotate(0deg)' }}>
+              <span>Homepage</span>
+              <span className={`cms-navbar-arrow ${showHomepageSubmenu ? 'open' : ''}`}>
                 ▶
               </span>
             </span>
-          </span>
-          {showHomepageSubmenu && (
-            <div style={{ marginLeft: '20px', marginTop: '8px' }}>
-              <Link 
-                to="/upload-banner" 
-                className={`cms-navbar-link ${isActive('/upload-banner') ? 'active' : ''}`}
-                style={{ fontSize: '0.9em', padding: '8px 12px' }}
-              >
-                <span style={{ marginRight: '8px' }}>🖼️</span>
-                Upload Banner
-              </Link>
-              <Link 
-                to="/seed-home-content" 
-                className={`cms-navbar-link ${isActive('/seed-home-content') ? 'active' : ''}`}
-                style={{ fontSize: '0.9em', padding: '8px 12px' }}
-              >
-                <span style={{ marginRight: '8px' }}>🌱</span>
-                Seed Home Content
-              </Link>
-              <Link 
-                to="/upload-markdown" 
-                className={`cms-navbar-link ${isActive('/upload-markdown') ? 'active' : ''}`}
-                style={{ fontSize: '0.9em', padding: '8px 12px' }}
-              >
-                <span style={{ marginRight: '8px' }}>✏️</span>
-                Edit Content
-              </Link>
-            </div>
-          )}
+          </div>
+          
+          <div className={`cms-navbar-submenu ${showHomepageSubmenu ? 'show' : ''}`}>
+            <Link 
+              to="/upload-banner" 
+              className={`cms-navbar-sublink ${isActive('/upload-banner') ? 'active' : ''}`}
+            >
+              Upload Banner
+            </Link>
+            <Link 
+              to="/upload-markdown" 
+              className={`cms-navbar-sublink ${isActive('/upload-markdown') ? 'active' : ''}`}
+            >
+              Homepage Content
+            </Link>
+            <Link 
+              to="/CMS" 
+              className={`cms-navbar-sublink ${isActive('/CMS') ? 'active' : ''}`}
+            >
+              CMS
+            </Link>
+          </div>
         </div>
-
+  
         {/* Outputs Section */}
-        <div>
-          <span
-            className="cms-navbar-link cms-navbar-dropdown-title"
+        <div className="cms-navbar-section">
+          <div
+            className="cms-navbar-dropdown-title"
             onClick={handleOutputpageClick}
             tabIndex={0}
-            style={{ cursor: "pointer" }}
             onKeyDown={e => {
               if (e.key === "Enter" || e.key === " ") handleOutputpageClick();
             }}
           >
             <span className="cms-navbar-dropdown-header">
-              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span>📊</span>
-                <span>Outputs</span>
-              </span>
-              <span style={{ transition: 'transform 0.2s', transform: showOutputpageSubmenu ? 'rotate(90deg)' : 'rotate(0deg)' }}>
+              <span>Outputs</span>
+              <span className={`cms-navbar-arrow ${showOutputpageSubmenu ? 'open' : ''}`}>
                 ▶
               </span>
             </span>
-          </span>
-          {showOutputpageSubmenu && (
-            <div style={{ marginLeft: '20px', marginTop: '8px' }}>
-              <Link 
-                to="/upload-article" 
-                className={`cms-navbar-link ${isActive('/upload-article') ? 'active' : ''}`}
-                style={{ fontSize: '0.9em', padding: '8px 12px' }}
-              >
-                <span style={{ marginRight: '8px' }}>📝</span>
-                Upload Article
-              </Link>
-              <Link 
-                to="/upload-video" 
-                className={`cms-navbar-link ${isActive('/upload-video') ? 'active' : ''}`}
-                style={{ fontSize: '0.9em', padding: '8px 12px' }}
-              >
-                <span style={{ marginRight: '8px' }}>🎥</span>
-                Upload Video
-              </Link>
-            </div>
-          )}
+          </div>
+          
+          <div className={`cms-navbar-submenu ${showOutputpageSubmenu ? 'show' : ''}`}>
+            <Link 
+              to="/upload-article" 
+              className={`cms-navbar-sublink ${isActive('/upload-article') ? 'active' : ''}`}
+            >
+              Upload Article
+            </Link>
+            <Link 
+              to="/upload-video" 
+              className={`cms-navbar-sublink ${isActive('/upload-video') ? 'active' : ''}`}
+            >
+              Upload Video
+            </Link>
+          </div>
         </div>
         
         {/* Workflow Section */}
-        <div>
-          <span
-            className="cms-navbar-link cms-navbar-dropdown-title"
+        <div className="cms-navbar-section">
+          <div
+            className="cms-navbar-dropdown-title"
             onClick={handleWorkflowClick}
             tabIndex={0}
-            style={{ cursor: "pointer" }}
             onKeyDown={e => {
               if (e.key === "Enter" || e.key === " ") handleWorkflowClick();
             }}
           >
             <span className="cms-navbar-dropdown-header">
-              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span>🔄</span>
-                <span>Workflow</span>
-              </span>
-              <span style={{ transition: 'transform 0.2s', transform: showWorkflowSubmenu ? 'rotate(90deg)' : 'rotate(0deg)' }}>
+              <span>Workflow</span>
+              <span className={`cms-navbar-arrow ${showWorkflowSubmenu ? 'open' : ''}`}>
                 ▶
               </span>
             </span>
-          </span>
-          {showWorkflowSubmenu && (
-            <div style={{ marginLeft: '20px', marginTop: '8px' }}>
-              <Link 
-                to="/upload-workflow" 
-                className={`cms-navbar-link ${isActive('/upload-workflow') ? 'active' : ''}`}
-                style={{ fontSize: '0.9em', padding: '8px 12px' }}
-              >
-                <span style={{ marginRight: '8px' }}>⚙️</span>
-                Manage Workflows
-              </Link>
-            </div>
-          )}
+          </div>
+          
+          <div className={`cms-navbar-submenu ${showWorkflowSubmenu ? 'show' : ''}`}>
+            <Link 
+              to="/upload-workflow" 
+              className={`cms-navbar-sublink ${isActive('/upload-workflow') ? 'active' : ''}`}
+            >
+              Manage Workflows
+            </Link>
+          </div>
         </div>
       </div>
-
-      <button onClick={handleLogout} className="cms-navbar-logout">
-        <span style={{ marginRight: '8px' }}>🚪</span>
-        Logout
-      </button>
+  
+      <div className="cms-navbar-user">
+        {user && (
+          <span className="cms-navbar-user-info">
+            Welcome, {user.username}
+            {user.demo && <span className="cms-navbar-demo-badge">DEMO</span>}
+          </span>
+        )}
+        <button onClick={handleLogout} className="cms-navbar-logout">
+          Logout
+        </button>
+      </div>
     </nav>
   );
 }
